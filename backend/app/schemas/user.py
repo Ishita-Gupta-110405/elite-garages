@@ -5,6 +5,10 @@ class UserCreate(BaseModel):
     password: str
     full_name: str
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
 class UserResponse(BaseModel):
     id: int
     email: str
@@ -12,3 +16,8 @@ class UserResponse(BaseModel):
     is_admin: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
