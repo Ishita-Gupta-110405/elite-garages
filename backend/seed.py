@@ -8,7 +8,6 @@ def seed_data():
     db = SessionLocal()
 
     try:
-        # 1. Seed Users if not present
         if not db.query(User).filter(User.email == "admin@dealership.com").first():
             admin = User(
                 email="admin@dealership.com",
@@ -26,7 +25,6 @@ def seed_data():
             db.commit()
             print("Seeded default Admin and Buyer accounts.")
 
-        # 2. Seed Vehicles if table is empty
         if db.query(Vehicle).count() == 0:
             vehicles = [
                 Vehicle(make="Porsche", model="911 GT3", category="Coupe", price=182900.0, quantity=2),
