@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.database import get_db
-from app.models.vehicle import Vehicle
+from app.models.vehicle import Vehicle, Order
 from app.models.user import User
 from app.schemas.vehicle import VehicleCreate, VehicleUpdate, VehicleResponse, RestockRequest
 from app.dependencies import get_current_user, require_admin
@@ -116,6 +116,13 @@ def purchase_vehicle(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Vehicle is currently out of stock"
         )
+
+    order = Order(
+        user_id = current_user.id,
+        vehicle_id = vehicle.id,
+        purchase_price = vehicle.price
+    )
+    db.add(order)
 
     db.commit()
     db.refresh(vehicle)
