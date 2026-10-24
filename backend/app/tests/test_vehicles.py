@@ -142,3 +142,23 @@ def test_purchase_creates_order_audit_record(client, db_session, test_user_token
     order = db_session.query(Order).filter(Order.vehicle_id == vehicle.id).first()
     assert order is not None
     assert order.purchase_price == 50000.0
+
+def test_get_user_order_history(client, db_session, test_user_token):
+    vehicle = Vehicle(make="Porsche", model="911 Carrera", category="Coupe", price=115000.0, quantity=2)
+    db_session.add(vehicle)
+    db_session.commit()
+
+    client.post(
+        f"/api/vehicles/{vehicle.id}/purchase",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    response = client.get(
+        "/api/vehicles/orders/history",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 200
+    orders = response.json()
+    assert len(orders) == 1
+    assert orders[0]["vehicle_id"] == vehicle.id
+    assert orders[0]["purchase_price"] == 115000.0
