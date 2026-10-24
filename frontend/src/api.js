@@ -1,12 +1,15 @@
 const API_BASE = '/api';
 
-const getHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
+let authToken = null;
+
+export const setAuthToken = (token) => {
+  authToken = token;
 };
+
+const getHeaders = () => ({
+  'Content-Type': 'application/json',
+  ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+});
 
 const handleResponse = async (res) => {
   if (res.status === 204) return null;
@@ -18,7 +21,6 @@ const handleResponse = async (res) => {
 };
 
 export const api = {
-  // Auth
   login: async (email, password) => {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
@@ -37,7 +39,6 @@ export const api = {
     return handleResponse(res);
   },
 
-  // Vehicles
   getVehicles: async () => {
     const res = await fetch(`${API_BASE}/vehicles`, { headers: getHeaders() });
     return handleResponse(res);
@@ -97,6 +98,22 @@ export const api = {
 
   getOrderHistory: async () => {
     const res = await fetch(`${API_BASE}/vehicles/orders/history`, {
+      headers: getHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  deleteOrder: async (orderId) => {
+    const res = await fetch(`${API_BASE}/vehicles/orders/${orderId}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  clearOrders: async () => {
+    const res = await fetch(`${API_BASE}/vehicles/orders`, {
+      method: 'DELETE',
       headers: getHeaders(),
     });
     return handleResponse(res);
