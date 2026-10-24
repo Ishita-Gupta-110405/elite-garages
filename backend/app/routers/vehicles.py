@@ -70,6 +70,36 @@ def get_order_history(
         return db.query(Order).order_by(Order.created_at.desc()).all()
     return db.query(Order).filter(Order.user_id == current_user.id).order_by(Order.created_at.desc()).all()
 
+@router.delete("/orders/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_order_record(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    query = db.query(Order).filter(Order.id == order_id)
+    if not current_user.is_admin:
+        query = query.filter(Order.user_id == current_user.id)
+
+    order = query.first()
+    if not order:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order record not found")
+
+    db.delete(order)
+    db.commit()
+    return None
+
+@router.delete("/orders", status_code=status.HTTP_204_NO_CONTENT)
+def clear_order_history(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.is_admin:
+        db.query(Order).delete()
+    else:
+        db.query(Order).filter(Order.user_id == current_user.id).delete()
+    db.commit()
+    return None
+
 @router.put("/{vehicle_id}", response_model=VehicleResponse)
 def update_vehicle(
     vehicle_id: int,

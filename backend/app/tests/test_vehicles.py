@@ -162,3 +162,35 @@ def test_get_user_order_history(client, db_session, test_user_token):
     assert len(orders) == 1
     assert orders[0]["vehicle_id"] == vehicle.id
     assert orders[0]["purchase_price"] == 115000.0
+
+def test_delete_order_history(client, db_session, test_user_token):
+    vehicle = Vehicle(make="Audi", model="RS7", category="Sedan", price=125000.0, quantity=2)
+    db_session.add(vehicle)
+    db_session.commit()
+
+    # Create an order via purchase
+    client.post(
+        f"/api/vehicles/{vehicle.id}/purchase",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+
+    orders = client.get(
+        "/api/vehicles/orders/history",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    ).json()
+    assert len(orders) == 1
+    order_id = orders[0]["id"]
+
+    # Delete the specific order record
+    del_res = client.delete(
+        f"/api/vehicles/orders/{order_id}",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    )
+    assert del_res.status_code == 204
+
+    # Verify history is now empty
+    orders_after = client.get(
+        "/api/vehicles/orders/history",
+        headers={"Authorization": f"Bearer {test_user_token}"}
+    ).json()
+    assert len(orders_after) == 0
