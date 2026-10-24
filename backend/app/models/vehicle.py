@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, CheckConstraint
+from datetime import datetime, timezone
+from sqlalchemy import Column, Integer, String, Float, CheckConstraint, ForeignKey, DateTime
 from app.database import Base
 
 class Vehicle(Base):
@@ -16,3 +17,12 @@ class Vehicle(Base):
         CheckConstraint("quantity >= 0", name="check_positive_quantity"),
         CheckConstraint("price >= 0", name="check_positive_price"),
     )
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    vehicle_id = Column(Integer, ForeignKey("vehicles.id"), nullable=False, index=True)
+    purchase_price = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)

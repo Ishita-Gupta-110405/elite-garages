@@ -1,6 +1,7 @@
 import pytest
 from app.models.vehicle import Vehicle
 from app.models.user import User
+from app.models.vehicle import Order
 from app.core_security import hash_password, create_access_token
 
 @pytest.fixture
@@ -127,3 +128,17 @@ def test_search_invalid_price_boundary_fails(client, test_user_token):
         headers={"Authorization": f"Bearer {test_user_token}"}
     )
     assert response.status_code == 400
+
+def test_purchase_creates_order_audit_record(client, db_session, test_user_token):
+    vehicle = Vehicle(make="Mazda", model="Miata", category="Convertible", price=50000.0, quantity=3)
+    db_session.add(vehicle)
+    db_session.commit()
+
+    response = client.post(
+        f"/api/vehicles/{vehicle.id}/purchase",
+        headers={"Authorization":f"Bearer {test_user_token}"}
+    )
+    assert response.status_code == 200
+    order = db_session.query(Order).filter(Order.vehicle_id == vehicle.id).first()
+    assert order is not None
+    assert order.purchase_price == 50000.0

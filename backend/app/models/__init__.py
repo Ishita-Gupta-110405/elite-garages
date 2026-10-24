@@ -1,7 +1,4 @@
 from app.models.user import User
-from app.models.user import User
-from app.models.vehicle import Vehicle
+from app.models.vehicle import Vehicle, Order
 
-__all__ = ["User", "Vehicle"]
-
-__all__ = ["User"]
+__all__ = ["User", "Vehicle", "Order"]
