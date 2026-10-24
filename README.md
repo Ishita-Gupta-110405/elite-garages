@@ -27,3 +27,15 @@ The entire application can be built and spun up locally with a single command us
 3. Run the following command:
    ```bash
    docker compose up --build
+
+# My AI Usage
+
+In accordance with the project guidelines, AI tools were actively leveraged as collaborative assistants throughout the software development lifecycle to accelerate boilerplate generation, structure testing suites, and refine UI/UX styling.
+
+* **AI Tools Used**: Gemini.
+* **How AI Was Used**:
+  * **Architecture & API Design**: Utilized AI to draft initial FastAPI router structures, SQLAlchemy models, and JWT security dependency injection patterns.
+  * **Test-Driven Development (TDD)**: Prompted AI to help generate edge-case unit test assertions for atomic stock purchases and order history deletion.
+  * **Frontend Styling & UI Layouts**: Collaborated with AI to design the luxury matte charcoal/champagne color palette, brand-specific livery mapping, and the multi-step checkout payment flow.
+* **Reflection & Impact**: 
+  AI significantly reduced the time spent writing repetitive boilerplate code and configuring modern tooling (such as Tailwind CSS v4 and Vite proxy mapping). This allowed me to focus my efforts on core backend logic, data integrity, concurrency safety, and verifying the test suite manually.
