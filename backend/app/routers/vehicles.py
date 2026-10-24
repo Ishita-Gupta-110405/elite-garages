@@ -6,7 +6,7 @@ from sqlalchemy import func
 from app.database import get_db
 from app.models.vehicle import Vehicle, Order
 from app.models.user import User
-from app.schemas.vehicle import VehicleCreate, VehicleUpdate, VehicleResponse, RestockRequest
+from app.schemas.vehicle import VehicleCreate, VehicleUpdate, VehicleResponse, RestockRequest, OrderResponse
 from app.dependencies import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/vehicles", tags=["vehicles"])
@@ -60,6 +60,15 @@ def search_vehicles(
         query = query.filter(Vehicle.price <= max_price)
 
     return query.all()
+
+@router.get("/orders/history", response_model=List[OrderResponse])
+def get_order_history(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.is_admin:
+        return db.query(Order).order_by(Order.created_at.desc()).all()
+    return db.query(Order).filter(Order.user_id == current_user.id).order_by(Order.created_at.desc()).all()
 
 @router.put("/{vehicle_id}", response_model=VehicleResponse)
 def update_vehicle(

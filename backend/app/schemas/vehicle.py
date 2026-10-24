@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
+from datetime import datetime
 from typing import Optional
 
 class VehicleBase(BaseModel):
@@ -23,5 +24,14 @@ class RestockRequest(BaseModel):
 
 class VehicleResponse(VehicleBase):
     id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderResponse(BaseModel):
+    id: int
+    user_id: int
+    vehicle_id: int
+    purchase_price: float
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
