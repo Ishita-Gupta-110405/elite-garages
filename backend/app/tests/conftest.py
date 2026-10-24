@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.database import Base, get_db
-# We will import app once main.py is created; for now it provides test fixtures
+import app.models  # <--- Loads all model classes (User, etc.) into Base.metadata
 
 TEST_DATABASE_URL = "sqlite:///./test_dealership.db"
 
@@ -17,7 +17,6 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture(scope="function")
 def db_session():
-    # Fresh database tables for every test function
     Base.metadata.create_all(bind=test_engine)
     db = TestingSessionLocal()
     try:
@@ -29,6 +28,7 @@ def db_session():
 @pytest.fixture(scope="function")
 def client(db_session):
     from app.main import app
+
     def override_get_db():
         try:
             yield db_session
